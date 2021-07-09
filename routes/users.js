@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
 		const userExist = await User.findOne({ email: email });
 
 		if (userExist) {
-			return res.status(404).json({ error: "user already exist" })
+			return res.status(422).json({ error: "user already exist" })
 		}
 		else if (password != cpassword) {
 			return res.json({ error: "password & confrimpassword does not match" })
@@ -45,7 +45,7 @@ router.post('/register', async (req, res) => {
 //login route
 router.post('/signin', async (req, res) => {
 	try {
-		let token;
+		// let token;
 		const { email, password } = req.body;
 		if (!email || !password) {
 			return res.status(400).json({ error: "fill the data properly" })
@@ -56,26 +56,42 @@ router.post('/signin', async (req, res) => {
 
 		if (userLogin) {
 			const isMatch = await bcrypt.compare(password, userLogin.password);
-			token = await userLogin.generateAuthToken();
-			console.log(token);
+			const token = await userLogin.generateAuthToken();
 
-			//storing token in cookies
-			res.cookie("jwttoken",token,{
-				expires:new Date(Date.now()+ 25892000000),
-				httpOnly:true
-			});
 			
+
+			// if (typeof localStorage === "undefined" || localStorage === null) {
+			// 	var LocalStorage = require('node-localstorage').LocalStorage;
+			// 	localStorage = new LocalStorage('./scratch');
+			// }
+			
+			// localStorage.setItem('myFirstKey', 'myFirstValue');
+			//console.log(localStorage.getItem('myFirstKey'));
+
 			if (!isMatch) {
 				//if password is invalid 
 				return res.status(400).json({ error: "invalid credentials" });
 			}
 			else {
+				// const token = jwt.sign({
+				// 	_id: userLogin._id,
+				// 	email:userLogin.email
+				// },
+				// 	'secretvariable', {
+				// 	expiresIn: '1h'
+				// }
+				// );
+				// res.status(200).json({
+				// 	message: "user found",
+				// 	token: token
+				// });
 				return res.json({ message: "user sign in successfully" });
 			}
+
 		}
 		else {
 			//if email is invalid 
-			return res.status(400).json({ error: "invalid credentials" })
+			return res.status(400).json({ error: "invalid credentials of  email" })
 		}
 	}
 	catch (err) {

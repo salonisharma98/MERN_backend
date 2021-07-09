@@ -27,23 +27,24 @@ const userSchema = new mongoose.Schema({
 	password:
 	{
 		type: String,
-		maxlength: 10,
+		
 		required: true
 	},
 	cpassword:
 	{
 		type: String,
-		maxlength: 10,
+		
 		required: true
 	},
-	tokens:[
-		{
+	 tokens:[
+	 	{
 			token:{
 				type: String,
 				// required:true
 			}
-		}
-	]
+	 	}
+	 ]
+	
 	// gender:
 	// {
 	// 	type: String
