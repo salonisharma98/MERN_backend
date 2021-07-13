@@ -3,16 +3,55 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/userSchema');
 const bcrypt = require('bcrypt');
-
+const { JWT_SECRET } = require("../jwt/Keys")
+const authenticate = require("../middleware/authenticate")
+const mongoose = require('mongoose')
 
 router.get('/', (req, res) => {
 	res.send('heelo router')
+})
+router.get('/register',authenticate, async (req, res) => {
+	try {
+		const users = await User.find()
+		res.json(users);
+		
+	}
+	catch (err) {
+		res.send('Error occured' + err);
+	}
+})
+
+// router.get('/profile/:profileid',authenticate, async (req, res) => {
+	
+// 	try {
+		
+// 		const user = await User.findById(req.params.id)
+// 		res.json(user);
+// 		console.log(user)
+// 	}
+// 	catch (err) {
+// 		res.send('Error occured' + err);
+// 	}
+// })
+
+//get other user
+router.get('/register/:id',authenticate, async (req, res) => {
+	
+	try {
+		
+		const user = await User.findById(req.params.id)
+		res.json(user);
+		
+	}
+	catch (err) {
+		res.send('Error occured' + err);
+	}
 })
 
 //adding user
 router.post('/register', async (req, res) => {
 	const { fName, lName, mobile, email, password, cpassword } = req.body;
-
+	console.log(req.body)
 	if (!fName || !lName || !mobile || !email || !password || !cpassword) {
 		return res.json({ error: "fill the fields properly" });
 	}
@@ -45,46 +84,23 @@ router.post('/register', async (req, res) => {
 //login route
 router.post('/signin', async (req, res) => {
 	try {
-		// let token;
 		const { email, password } = req.body;
 		if (!email || !password) {
 			return res.status(400).json({ error: "fill the data properly" })
 		}
-
 		const userLogin = await User.findOne({ email: email });
-		// console.log(userLogin);
-
 		if (userLogin) {
 			const isMatch = await bcrypt.compare(password, userLogin.password);
-			const token = await userLogin.generateAuthToken();
-
-			
-
-			// if (typeof localStorage === "undefined" || localStorage === null) {
-			// 	var LocalStorage = require('node-localstorage').LocalStorage;
-			// 	localStorage = new LocalStorage('./scratch');
-			// }
-			
-			// localStorage.setItem('myFirstKey', 'myFirstValue');
-			//console.log(localStorage.getItem('myFirstKey'));
 
 			if (!isMatch) {
 				//if password is invalid 
 				return res.status(400).json({ error: "invalid credentials" });
 			}
 			else {
-				// const token = jwt.sign({
-				// 	_id: userLogin._id,
-				// 	email:userLogin.email
-				// },
-				// 	'secretvariable', {
-				// 	expiresIn: '1h'
-				// }
-				// );
-				// res.status(200).json({
-				// 	message: "user found",
-				// 	token: token
-				// });
+				const token = jwt.sign({ _id:userLogin._id }, JWT_SECRET)
+				const{_id}=userLogin
+				res.json({ token,id:{_id} })
+				
 				return res.json({ message: "user sign in successfully" });
 			}
 
@@ -99,4 +115,11 @@ router.post('/signin', async (req, res) => {
 	}
 
 })
+
+//home
+router.get('/Home', authenticate, (req, res) => {
+	res.send('Home page')
+})
+
+
 module.exports = router;

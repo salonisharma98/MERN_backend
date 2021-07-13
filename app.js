@@ -1,21 +1,18 @@
-const dotenv=require("dotenv");
 require('./db/connect');
 const express = require('express');
+var cors = require('cors')
 const router = require('./routes/users')
 const User = require('./models/userSchema');
 const app = express();
-dotenv.config({path:'./config.env'});
+
 
 app.use(express.json());
 
-// const middleware=(req,res,next)=>{
-// 	console.log('middleware');
-// 	next();
-// }
-
+app.use(cors());
 //router file link
 app.use(require('./routes/users'))
 
-app.listen(3000, () => {
-	console.log('listening to port 3000');
+// app.use(cors());
+app.listen(5000, () => {
+	console.log('listening to port 5000');
 })

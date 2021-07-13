@@ -36,14 +36,14 @@ const userSchema = new mongoose.Schema({
 		
 		required: true
 	},
-	 tokens:[
-	 	{
-			token:{
-				type: String,
-				// required:true
-			}
-	 	}
-	 ]
+	//  tokens:[
+	//  	{
+	// 		token:{
+	// 			type: String,
+	// 			// required:true
+	// 		}
+	//  	}
+	//  ]
 	
 	// gender:
 	// {
@@ -66,18 +66,20 @@ userSchema.pre('save', async function (next) {
 	}
 });
 // generating token
-userSchema.methods.generateAuthToken=async function(){
-	try{
-		console.log("inside try block");
-		let token=jwt.sign({_id:this._id},process.env.SECRET_KEY);
-		this.tokens=this.tokens.concat({token:token});
-		await this.save();
-		return token;
+// userSchema.methods.generateAuthToken=async function(){
+// 	try{
+// 		console.log("inside try block");
+// 		let token=jwt.sign({_id:this._id},process.env.SECRET_KEY);
+// 		this.tokens=this.tokens.concat({token:token});
+// 		await this.save();
+	
 		
-	}catch(err){
-		console.log("inside catch block");
-		console.log(err);
-	}
-};
+// 		return token;
+		
+// 	}catch(err){
+// 		console.log("inside catch block");
+// 		console.log(err);
+// 	}
+// };
 
 module.exports = mongoose.model('User', userSchema);
