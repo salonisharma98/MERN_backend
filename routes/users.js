@@ -13,42 +13,47 @@ router.get('/', (req, res) => {
 router.get('/register',authenticate, async (req, res) => {
 	try {
 		const users = await User.find()
-		res.json(users);
-		
+		res.json(users);		
 	}
 	catch (err) {
 		res.send('Error occured' + err);
 	}
 })
-
-// router.get('/profile/:profileid',authenticate, async (req, res) => {
-	
-// 	try {
-		
-// 		const user = await User.findById(req.params.id)
-// 		res.json(user);
-// 		console.log(user)
-// 	}
-// 	catch (err) {
-// 		res.send('Error occured' + err);
-// 	}
-// })
-
-//get other user
-router.get('/register/:id',authenticate, async (req, res) => {
-	
+//search user
+router.get('/search_user',authenticate, async (req, res) => {
 	try {
-		
-		const user = await User.findById(req.params.id)
-		res.json(user);
-		
+		const users = await User.find()
+		res.json(users);		
 	}
 	catch (err) {
 		res.send('Error occured' + err);
 	}
 })
+//get curent user
+router.get('/current_user',authenticate, async (req, res) => {
+	try {		
+	const users = await User.findOne({_id:req.User._id})
+	res.json(users);
+	console.log(users)		
+	}
+	catch (err) {	
+		res.send('Error occured' + err);
+	}
+})
+//get other users profile
+router.get('/search_user/:id',authenticate, async (req, res) => {
+	try {		
+	const users = await User.findOne({_id:req.params.id})
+	res.json(users);
+	console.log(users)		
+	}
+	catch (err) {	
+		res.send('Error occured' + err);
+	}
+})
 
-//adding user
+
+//registering user
 router.post('/register', async (req, res) => {
 	const { fName, lName, mobile, email, password, cpassword } = req.body;
 	console.log(req.body)
@@ -98,16 +103,15 @@ router.post('/signin', async (req, res) => {
 			}
 			else {
 				const token = jwt.sign({ _id:userLogin._id }, JWT_SECRET)
-				const{_id}=userLogin
-				res.json({ token,id:{_id} })
+				const{_id,fName,lName,mobile,email}=userLogin
+				res.json({ token,user:{_id,fName,lName,mobile,email} })
 				
 				return res.json({ message: "user sign in successfully" });
 			}
-
 		}
 		else {
 			//if email is invalid 
-			return res.status(400).json({ error: "invalid credentials of  email" })
+			return res.status(400).json({ error: "invalid credentials" })
 		}
 	}
 	catch (err) {
@@ -115,11 +119,10 @@ router.post('/signin', async (req, res) => {
 	}
 
 })
-
 //home
 router.get('/Home', authenticate, (req, res) => {
 	res.send('Home page')
 })
-
+//logout
 
 module.exports = router;
