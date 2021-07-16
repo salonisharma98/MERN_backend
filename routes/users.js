@@ -41,11 +41,17 @@ router.get('/current_user',authenticate, async (req, res) => {
 	}
 })
 //get other users profile
-router.get('/search_user/:id',authenticate, async (req, res) => {
+router.get('/search_user/:id',(req, res) => {
 	try {		
-	const users = await User.findOne({_id:req.params.id})
-	res.json(users);
-	console.log(users)		
+	let id = req.params.id
+	// console.log(req,'reqq');
+	// console.log(req.params,'params');
+	const users = User.findById(id,function(err, data) {
+		console.log(data,'i am data')
+		res.json(data);
+	  });
+	//res.json(users,'now showing users');
+	//console.log(users)		
 	}
 	catch (err) {	
 		res.send('Error occured' + err);
@@ -123,6 +129,9 @@ router.post('/signin', async (req, res) => {
 router.get('/Home', authenticate, (req, res) => {
 	res.send('Home page')
 })
-//logout
+//logout history
+router.get('/logout',  (req, res) => {
+	
+})
 
 module.exports = router;

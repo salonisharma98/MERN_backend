@@ -50,6 +50,13 @@ const userSchema = new mongoose.Schema({
 	// 	type: String
 
 	// }
+	logoutHistory:[
+		{
+		history:{
+			type:String
+		}
+	}
+	]
 })
 userSchema.pre('save', async function (next) {
 	try {
