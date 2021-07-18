@@ -5,59 +5,57 @@ const User = require('../models/userSchema');
 const bcrypt = require('bcrypt');
 const { JWT_SECRET } = require("../jwt/Keys")
 const authenticate = require("../middleware/authenticate")
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+
 
 router.get('/', (req, res) => {
 	res.send('heelo router')
 })
-router.get('/register',authenticate, async (req, res) => {
+//get registerd user
+router.get('/register', authenticate, async (req, res) => {
 	try {
 		const users = await User.find()
-		res.json(users);		
+		res.json(users);
 	}
 	catch (err) {
 		res.send('Error occured' + err);
 	}
 })
 //search user
-router.get('/search_user',authenticate, async (req, res) => {
+router.get('/search_user', authenticate, async (req, res) => {
 	try {
 		const users = await User.find()
-		res.json(users);		
+		res.json(users);
 	}
 	catch (err) {
 		res.send('Error occured' + err);
 	}
 })
 //get curent user
-router.get('/current_user',authenticate, async (req, res) => {
-	try {		
-	const users = await User.findOne({_id:req.User._id})
-	res.json(users);
-	console.log(users)		
+router.get('/current_user', authenticate, async (req, res) => {
+	try {
+		const users = await User.findOne({ _id: req.User._id })
+		res.json(users);
+		console.log(users)
 	}
-	catch (err) {	
-		res.send('Error occured' + err);
-	}
-})
-//get other users profile
-router.get('/search_user/:id',(req, res) => {
-	try {		
-	let id = req.params.id
-	// console.log(req,'reqq');
-	// console.log(req.params,'params');
-	const users = User.findById(id,function(err, data) {
-		console.log(data,'i am data')
-		res.json(data);
-	  });
-	//res.json(users,'now showing users');
-	//console.log(users)		
-	}
-	catch (err) {	
+	catch (err) {
 		res.send('Error occured' + err);
 	}
 })
 
+//get other users profile
+router.get('/search_user/:id', (req, res) => {
+	try {
+		let id = req.params.id
+		const users = User.findById(id, function (err, data) {
+			console.log(data, 'i am data')
+			res.json(data);
+		});
+	}
+	catch (err) {
+		res.send('Error occured' + err);
+	}
+})
 
 //registering user
 router.post('/register', async (req, res) => {
@@ -108,10 +106,10 @@ router.post('/signin', async (req, res) => {
 				return res.status(400).json({ error: "invalid credentials" });
 			}
 			else {
-				const token = jwt.sign({ _id:userLogin._id }, JWT_SECRET)
-				const{_id,fName,lName,mobile,email}=userLogin
-				res.json({ token,user:{_id,fName,lName,mobile,email} })
-				
+				const token = jwt.sign({ _id: userLogin._id }, JWT_SECRET)
+				const { _id } = userLogin
+				res.json({ token, user: { _id }, userLogin })
+
 				return res.json({ message: "user sign in successfully" });
 			}
 		}
@@ -125,13 +123,26 @@ router.post('/signin', async (req, res) => {
 	}
 
 })
-//home
-router.get('/Home', authenticate, (req, res) => {
-	res.send('Home page')
-})
-//logout history
-router.get('/logout',  (req, res) => {
-	
-})
 
+//logout history 
+router.put('/logouthistory/:id', (req, res) => {
+	console.log('inside route')
+	let id = req.params.id
+	console.log(id, 'i am id');
+	const date = req.body.logoutHistory;
+	console.log(date, 'i am date');
+	User.findByIdAndUpdate(id, {
+		$push: { logoutHistory: { date: date } }
+	},
+		{ new: true, upsert: true }, function (error, result) {
+			if (result) {
+				console.log(result, 'i m result new')
+				res.json(result)
+			} else {
+				console.log(error, 'i m errror new')
+				res.json(error)
+			}
+		}
+	)
+})
 module.exports = router;

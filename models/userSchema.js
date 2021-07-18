@@ -36,27 +36,12 @@ const userSchema = new mongoose.Schema({
 		
 		required: true
 	},
-	//  tokens:[
-	//  	{
-	// 		token:{
-	// 			type: String,
-	// 			// required:true
-	// 		}
-	//  	}
-	//  ]
 	
-	// gender:
-	// {
-	// 	type: String
-
-	// }
-	logoutHistory:[
-		{
-		history:{
-			type:String
+	logoutHistory:[{
+		date:{
+			type:Date
 		}
-	}
-	]
+	}]
 })
 userSchema.pre('save', async function (next) {
 	try {
@@ -72,21 +57,4 @@ userSchema.pre('save', async function (next) {
 		next(error);
 	}
 });
-// generating token
-// userSchema.methods.generateAuthToken=async function(){
-// 	try{
-// 		console.log("inside try block");
-// 		let token=jwt.sign({_id:this._id},process.env.SECRET_KEY);
-// 		this.tokens=this.tokens.concat({token:token});
-// 		await this.save();
-	
-		
-// 		return token;
-		
-// 	}catch(err){
-// 		console.log("inside catch block");
-// 		console.log(err);
-// 	}
-// };
-
 module.exports = mongoose.model('User', userSchema);
